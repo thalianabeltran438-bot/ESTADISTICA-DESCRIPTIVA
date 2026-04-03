@@ -1,0 +1,1380 @@
+---
+title: GGPLOT2
+author: Thaliana Beltran
+date: "2026-03-30"
+format: 
+  html:
+    theme: 
+      light: flatly
+      dark: darkly
+    toc: true
+    toc_float: true
+    number-sections: true
+    code-fold: show
+    code-tools: true
+    code-copy: hover
+    code-overflow: wrap
+    embed-resources: true
+reference-location: margin
+lang : es
+---
+
+# INTRODUCCION
+
+La visualización de datos constituye una pieza clave dentro del análisis estadístico y la toma de decisiones informadas. Mediante representaciones gráficas es posible reconocer patrones, tendencias y relaciones que de otro modo pasarían desapercibidas en un conjunto de datos.
+
+En este documento se emplean diversos conjuntos de datos simulados para poner en práctica técnicas de visualización con la librería ggplot2 del lenguaje R. El propósito es mostrar distintas maneras de comunicar información a través de gráficos de dispersión, histogramas, diagramas de caja, líneas de tiempo y visualizaciones facetadas.
+
+## Dataset
+
+```{r}
+library(ggplot2)
+
+students <- data.frame(
+  id = 1:20,
+  hours_study = c(2,3,4,5,6,3,4,7,8,5,6,7,3,2,9,10,4,6,8,5),
+  score = c(50,55,65,70,75,60,66,80,85,72,74,78,58,52,90,95,67,76,88,73),
+  gender = rep(c("Male","Female"),10),
+  major = rep(c("Engineering","Business","Arts","Science"),5)
+)
+```
+
+# ANALISIS DEL RENDIMIENTO DE ESTUDIANTES
+
+## DIAGRAMA DE DISPERSION HORAS DE ESTUDIO VS PUNTAJE
+
+Crear un gráfico de dispersión que muestre la relación entre las horas de estudio y el puntaje obtenido.
+
+```{r}
+ggplot(students, aes(hours_study, score)) +
+  geom_point(color="blue", size=3) +
+  theme_minimal() +
+  labs(
+    title="RELACION ENTRE HORAS DE ESTUDIO Y PUNTAJE",
+    x="HORAS DE ESTUDIO",
+    y="PUNTAJE"
+  ) +
+  theme(
+    plot.title = element_text(hjust=0.5),
+    panel.grid = element_line(color="#E6E6FA" )
+  )
+```
+
+El gráfico evidencia una relación ascendente entre las horas dedicadas al estudio y los puntajes obtenidos. A medida que los estudiantes invierten más tiempo en preparar sus materias, sus resultados tienden a mejorar de forma consistente.
+
+------------------------------------------------------------------------
+
+## ETIQUETAS Y TEMAS
+
+```{r message=FALSE, warning=FALSE}
+ggplot(students, aes(hours_study, score, color = gender)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  labs(
+    title = "HORAS DE ESTUDIO Y RENDIMIENTO POR GENERO",
+    x = "Horas de estudio",
+    y = "Puntaje"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),          
+    axis.title.x = element_text(size = 14),          
+    axis.title.y = element_text(size = 14),          
+    legend.position = "none"                         
+  )
+```
+
+La línea de regresión refleja de manera evidente la relación positiva entre el tiempo dedicado al estudio y el rendimiento académico. El uso de diferentes colores en el gráfico facilita la comparación entre géneros, mostrando que, aunque existen ligeras variaciones, la tendencia general es consistente: a mayor número de horas de estudio, mejores resultados en las calificaciones.
+
+## CAPAS GEOMETICAS
+
+## Boxplot
+
+```{r}
+
+ggplot(students, aes(gender, score, fill = gender)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Distribución de puntajes por género",
+    x = "Género",
+    y = "Puntaje"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    legend.position = "none"
+  )
+
+```
+
+Aunque ambos géneros muestran una tendencia positiva en el rendimiento, las mujeres parecen tener un desempeño más consistente, mientras que los hombres presentan mayor diversidad en sus resultados.
+
+## Histograma
+
+```{r}
+ggplot(students, aes(score)) +
+  geom_histogram(bins = 15, fill = "pink", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Distribución de puntajes",
+    x = "Puntaje",
+    y = "Frecuencia"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14)
+  )
+```
+
+La distribución de los puntajes muestra una clara concentración en la franja media alta, especialmente alrededor de los valores de 70 y 75, donde se observa la mayor frecuencia. Aunque los resultados abarcan un rango amplio, la mayoría de los estudiantes se agrupan en torno a valores medios, con pocos casos en los extremos bajos y altos. Esto indica que el rendimiento general es aceptable y relativamente estable dentro del grupo.
+
+## VISUALIZACION POR FACETAS
+
+## Relacion entre horas de estudio y puntaje segun la cerrera
+
+```{r message=FALSE, warning=FALSE}
+ggplot(students, aes(hours_study, score)) +
+  geom_point(size = 3, color = "#FFB6C1") +   
+  geom_smooth(method = "lm", se = FALSE, color = "deeppink") +
+  facet_wrap(~major) +
+  theme_minimal(base_size = 15) +             
+  labs(
+    title = "Relación entre horas de estudio y puntaje según la carrera",
+    x = "Horas de estudio",
+    y = "Puntaje"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5, size = 18))
+```
+
+El uso de facet_wrap() permite dividir el gráfico en paneles según la variable major, que representa la carrera de los estudiantes. Cada panel muestra de manera independiente la relación entre las horas de estudio y el puntaje dentro de una carrera específica. Esta organización facilita la comparación visual entre disciplinas, ya que permite identificar similitudes y diferencias en el comportamiento académico de los estudiantes según su área de estudio.
+
+## Relacion entre horas de estudio y puntaje por genero y carrera
+
+*facet_grid()*
+
+```{r message=FALSE, warning=FALSE}
+ggplot(students, aes(hours_study, score, color = gender)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~major) +
+  scale_color_manual(values = c("Male" = "blue", "Female" = "#FFB6C1")) +
+  theme_minimal(base_size = 15) +
+  labs(
+    title = "Relación entre horas de estudio y puntaje según la carrera",
+    x = "Horas de estudio",
+    y = "Puntaje"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5, size = 18))
+```
+
+El uso de facet_grid() organiza los gráficos en una cuadrícula donde las filas representan el género y las columnas la carrera de los estudiantes. Esta disposición permite observar simultáneamente cómo varía la relación entre horas de estudio y puntaje al considerar dos variables categóricas al mismo tiempo. De esta manera, se facilita la comparación cruzada: es posible identificar patrones comunes o diferencias tanto entre géneros como entre áreas de estudio, ofreciendo una visión más completa y detallada del comportamiento académico.
+
+## Personalización estética
+
+```{r message=FALSE, warning=FALSE}
+ggplot(students, aes(hours_study, score,
+                     color = gender,
+                     shape = major)) +
+  geom_point(aes(size = score), alpha = 0.8) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("Male" = "blue", "Female" = "#FF69B4")) + # azul y rosado
+  theme_minimal(base_size = 15) +
+  labs(
+    title = "Análisis multivariable del rendimiento académico",
+    x = "Horas de estudio",
+    y = "Calificación",
+    color = "Género",
+    shape = "Carrera",
+    size = "Calificación"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5, size = 18))
+```
+
+Este gráfico integra varias dimensiones de los datos en una sola visualización mediante atributos estéticos diferenciados. El color distingue el género, la forma de los puntos identifica la carrera y el tamaño refleja la calificación obtenida. Además, la línea de tendencia muestra cómo las horas de estudio se relacionan con el rendimiento académico. Esta combinación de elementos facilita un análisis multivariable, permitiendo observar patrones generales y, al mismo tiempo, comparar diferencias entre grupos de estudiantes según género y área de estudio.
+
+# VISUALIZACION DE DATOS EMPRESARIALES
+
+## Dataset
+
+```{r}
+sales <- data.frame(
+  month = rep(month.abb[1:12],4),
+  region = rep(c("North","South","East","West"),each=12),
+  sales = c(
+    120,130,125,140,150,160,170,165,155,145,135,125,
+    100,110,105,120,130,135,140,138,132,125,118,110,
+    90,95,100,110,115,120,125,123,118,112,105,98,
+    80,85,88,95,100,105,110,108,102,97,90,85
+  ),
+  marketing_spend = c(
+    20,22,21,23,25,26,28,27,26,24,23,22,
+    18,19,18,20,22,23,24,23,22,21,20,19,
+    15,16,17,18,19,20,21,20,19,18,17,16,
+    12,13,14,15,16,17,18,17,16,15,14,13
+  ),
+  employees = rep(c(50,45,40,35),each=12)
+)
+```
+
+## VISUALIZACION BASICA
+
+```{r message=FALSE, warning=FALSE}
+ggplot(sales, aes(x = marketing_spend, y = sales, color = region)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  labs(
+    title = "Ventas en función de la inversión en marketing",
+    x = "Inversión en marketing",
+    y = "Ventas"
+  ) +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(hjust = 0.5)
+  ) +
+  scale_color_manual(values = c("North" = "red", "South" = "blue", "East" = "green", "West" = "purple"))
+```
+
+El gráfico evidencia una relación positiva entre la inversión en marketing y las ventas a medida que aumenta el gasto en marketing, también tienden a crecer los ingresos. Las regiones con mayores niveles de inversión muestran un desempeño superior en ventas.
+
+## ETIQUETAS Y TEMAS
+
+```{r}
+ggplot(sales, aes(marketing_spend, sales, color = region)) +
+  geom_point(size = 4) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),   
+    axis.text = element_text(size = 12),                 
+    axis.title = element_text(size = 14),                
+    legend.position = "bottom"                          
+  ) +
+  labs(
+    title = "Relación entre inversión en marketing y ventas por región",
+    x = "Gasto en marketing",
+    y = "Ventas",
+    color = "Región"
+  )
+```
+
+El gráfico permite visualizar la evolución de las ventas a lo largo del año en cada región, mostrando patrones diferenciados según el territorio. Se observa que, aunque todas las regiones siguen una tendencia general de variaciones mensuales, algunas presentan un crecimiento más sostenido
+
+## VISUALISACION TEMPORAL
+
+```{r}
+ggplot(sales, aes(month, sales, group = region)) +
+  # Todas las regiones en gris claro
+  geom_line(color = "grey80", linewidth = 1) +
+  geom_point(color = "grey80", size = 2) +
+  # Región North resaltada
+  geom_line(
+    data = subset(sales, region == "North"),
+    aes(color = region),
+    linewidth = 1.5
+  ) +
+  geom_point(
+    data = subset(sales, region == "North"),
+    aes(color = region),
+    size = 3
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, size = 16)
+  ) +
+  labs(
+    title = "Evolución mensual de las ventas (región Norte destacada)",
+    x = "Mes",
+    y = "Ventas",
+    color = "Región"
+  )
+```
+
+El gráfico muestra la evolución mensual de las ventas en todas las regiones, destacando de manera especial la región Norte. Se observa que, aunque las demás regiones mantienen un comportamiento relativamente estable y en niveles más bajos, la región Norte presenta un volumen de ventas superior y variaciones más marcadas a lo largo del año. Esto sugiere que el Norte concentra una mayor dinámica comercial, con picos de crecimiento.
+
+## GRAFICAS DE DISTRIBUCION
+
+## Boxplot
+
+```{r}
+ggplot(sales, aes(region, sales, fill = region)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Distribución de las ventas según la región",
+    x = "Región",
+    y = "Ventas",
+    fill = "Región"
+  )
+```
+
+Muestra cómo se distribuyen las ventas en cada región. Se observa la mediana (línea central de cada caja), la variabilidad (altura de la caja y longitud de los bigotes), Las regiones de las cajas más altas indican ventas generalmente superiores
+
+## Histograma
+
+```{r}
+ggplot(sales, aes(marketing_spend)) +
+  geom_histogram(binwidth = 2, fill = "pink", color = "white") +
+  theme_minimal() +
+  labs(
+    title = "Distribución del gasto en marketing",
+    x = "Gasto en marketing",
+    y = "Frecuencia"
+  )
+```
+
+El histograma muestra cómo se distribuye los gasto en marketing a lo largo del año. Se observa que la mayoría de las inversiones se concentran en niveles bajos y medios, . La frecuencia disminuye a medida que el gasto aumenta, lo que sugiere que las campañas con mayor inversión son menos comunes. Esta distribución refleja que la empresa tiende a mantener un control en sus presupuestos de marketing.
+
+## Facetas
+
+```{r}
+ggplot(sales, aes(x = marketing_spend, y = sales, 
+                  color = region, size = employees)) +
+  geom_point(alpha = 0.8) +                                 
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +  
+  facet_wrap(~region) +                                    
+  theme_minimal() +                                        
+  labs(
+    title = "Relación entre inversión en marketing y ventas por región",
+    x = "Gasto en marketing",
+    y = "Ventas",
+    color = "Región",
+    size = "Número de empleados"
+  )
+```
+
+El gráfico muestra cómo el gasto en marketing se relaciona con las ventas en cada región, presentando un panel separado para cada una. En general, se ve que cuando aumenta la inversión en marketing también tienden a subir las ventas, aunque la fuerza de esa relación cambia según la región. En algunas zonas el efecto es más fuerte y claro, mientras que en otras es más moderado.
+
+El tamaño de los puntos indica la cantidad de empleados, y se nota que las regiones con más personal suelen tener mayores ventas.
+
+# Ejercicios con Dataset de Kaggle (Customer Churn)
+
+## Dataset
+
+```{r}
+customers <- data.frame(
+  tenure=c(1,5,10,12,24,36,48,60,72,3,6,9,15,18,30,42,54,66,70,8),
+  monthly_charges=c(70,75,80,85,90,95,100,105,110,65,72,78,82,88,92,98,102,108,112,76),
+  total_charges=c(70,375,800,1020,2160,3420,4800,6300,7920,195,432,702,1230,1584,2760,4116,5508,7128,7840,608),
+  churn=rep(c("Yes","No"),10),
+  contract = rep(c("Month-to-month","One year","Two year","Month-to-month"),5),
+  internet_service = rep(c("DSL","Fiber","DSL","Fiber"),5)
+)
+```
+
+------------------------------------------------------------------------
+
+## GRAFICO DE DISPERCION: ANTIGUEDAD VS CARGO MENSUAL
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges)) +
+  geom_point(color = "steelblue", size = 3, alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Relación entre antigüedad y cargos mensuales",
+       x = "Meses de permanencia",
+       y = "Cargos mensuales")
+```
+
+El gráfico muestra que a medida que aumenta la antigüedad del cliente, también tienden a subir los cargos mensuales. Esto sugiere que los clientes con más tiempo en la compañía suelen tener planes más costosos o servicios adicionales.
+
+## GRÁFICO DE DISPERSIÓN: CARGOS MENSUALES SEGÚN CHURN
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point(size = 3, alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Cargos mensuales según permanencia y churn",
+       x = "Meses de permanencia",
+       y = "Cargos mensuales",
+       color = "Churn")
+```
+
+Aquí se distingue entre clientes que abandonaron el servicio y los que permanecen. Se observa que los clientes con menor antigüedad y cargos más bajos tienden a tener mayor probabilidad de churn, mientras que los clientes más antiguos suelen mantenerse.
+
+## GRÁFICO DE DISPERSIÓN CON LÍNEA DE REGRESIÓN
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+  theme_minimal() +
+  labs(title = "Tendencia entre antigüedad y cargos mensuales",
+       x = "Meses de permanencia",
+       y = "Cargos mensuales",
+       color = "Churn")
+```
+
+La línea confirma una tendencia positiva, más antigüedad, mayores cargos.
+
+## GRÁFICO DE CAJA: CARGOS MENSUALES SEGÚN CHURN
+
+```{r}
+ggplot(customers, aes(churn, monthly_charges, fill = churn)) +
+  geom_boxplot(alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Distribución de cargos mensuales según churn",
+       x = "Churn",
+       y = "Cargos mensuales",
+       fill = "Churn")
+```
+
+Los clientes que se fueron tienen cargos más bajos y menos dispersión.
+
+## HISTOGRAMA: DISTRIBUCIÓN DE LA ANTIGÜEDAD DE CLIENTES
+
+```{r}
+ggplot(customers, aes(tenure)) +
+  geom_histogram(binwidth = 6, fill = "steelblue", color = "white") +
+  theme_minimal() +
+  labs(title = "Distribución de la antigüedad de clientes",
+       x = "Meses de permanencia",
+       y = "Frecuencia")
+```
+
+La mayoría de clientes se concentra en tenures bajos y medios.
+
+## HISTOGRAMA CON NÚMERO DE INTERVALOS AJUSTADO
+
+```{r}
+ggplot(customers, aes(tenure)) +
+  geom_histogram(bins = 5, fill = "darkorange", color = "white") +
+  theme_minimal()
+```
+
+Con menos bins se agrupan los clientes en rangos más amplios de permanencia.
+
+## GRÁFICO DE VIOLÍN: CARGOS MENSUALES POR TIPO DE CONTRATO
+
+```{r}
+ggplot(customers, aes(contract, monthly_charges, fill = contract)) +
+  geom_violin(alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Distribución de cargos mensuales por tipo de contrato",
+       x = "Contrato",
+       y = "Cargos mensuales")
+  
+```
+
+El gráfico de violín muestra cómo se distribuyen los cargos mensuales según el tipo de contrato. Se observa que los contratos de mes a mes tienen una distribución más amplia, con clientes pagando desde valores bajos hasta altos, lo que refleja mayor variabilidad en los planes. En cambio, los contratos de uno o dos años tienden a concentrarse en rangos más altos y estables, lo que indica que quienes se comprometen a largo plazo suelen elegir planes más costosos y consistentes.
+
+## GRÁFICO DE DENSIDAD: CARGOS MENSUALES SEGÚN CHURN
+
+```{r}
+ggplot(customers, aes(monthly_charges, fill = churn)) +
+  geom_density(alpha = 0.5) +
+  theme_minimal()
+```
+
+La densidad revela cómo se distribuyen los cargos mensuales entre clientes que se fueron y los que permanecen. Los clientes que abandonaron se concentran en valores más bajos de cargos mensuales, lo que sugiere que quienes pagan menos tienden a tener menor fidelidad. Por otro lado, los clientes que permanecen muestran mayor densidad en rangos medios y altos, lo que indica que quienes invierten más en el servicio tienden a quedarse.
+
+## GRÁFICa DE BARRAS: NÚMERO DE CLIENTES POR CONTRATO
+
+```{r}
+ggplot(customers, aes(contract)) +
+  geom_bar(fill = "steelblue") +
+  theme_minimal()
+```
+
+El contrato mes a mes es el más frecuente, lo que refleja preferencia por la flexibilidad. Sin embargo, esta modalidad también implica mayor riesgo de churn, ya que los clientes no tienen compromisos de largo plazo. Los contratos de uno y dos años son menos comunes, pero representan clientes más estables. Esto muestra que la empresa depende en gran medida de clientes con contratos cortos, lo que plantea un reto en fidelización.
+
+## GRÁFICO DE BARRAS: CONTRATOS LLENOS POR CHURN
+
+```{r}
+ggplot(customers, aes(contract, fill = churn)) +
+  geom_bar(position = "dodge") +
+  theme_minimal()
+```
+
+Los contratos mes a mes concentran la mayor proporción de clientes que se fueron, mientras que los contratos de uno y dos años tienen más clientes que permanecen. Esto confirma que la modalidad de contrato es un factor clave en la retención: los compromisos largos reducen el churn, mientras que la flexibilidad mensual lo aumenta. Incentivar contratos más largos podría mejorar la estabilidad de la base de clientes.
+
+## GRÁFICO DE DISPERSIÓN FACETEADO POR SERVICIO DE INTERNET
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point() +
+  facet_wrap(~internet_service) +
+  theme_minimal()
+```
+
+Separando por tipo de internet, se observa que los clientes con fibra óptica tienden a tener cargos más altos y muestran una relación más clara entre permanencia y gasto. Los clientes con DSL presentan cargos más bajos y más dispersión. Esto indica que el tipo de servicio influye en el perfil de gasto y posiblemente en la fidelidad: quienes contratan fibra invierten más y permanecen más tiempo, mientras que los de DSL son más sensibles al precio.
+
+## GRÁFICO FACETEADO POR TIPO DE CONTRATO
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point() +
+  facet_wrap(~contract) +
+  theme_minimal()
+```
+
+Los clientes con contratos de uno o dos años tienen cargos mensuales más altos y muestran menor churn. En contraste, los contratos mes a mes presentan mayor variabilidad y más casos de abandono.
+
+## GRÁFICO DE LÍNEA: PROMEDIO DE CARGOS MENSUALES POR ANTIGÜEDAD
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges)) +
+  stat_summary(fun = mean, geom = "line", color = "steelblue") +
+  theme_minimal()
+```
+
+La línea muestra que el promedio de cargos mensuales aumenta con la antigüedad. Esto puede deberse a que los clientes antiguos agregan servicios adicionales o migran a planes más completos. El hallazgo es positivo: mantener clientes más tiempo no solo reduce el churn, sino que también incrementa el valor del cliente en el tiempo.
+
+## GRÁFICO DE DISPERSIÓN: ANTIGÜEDAD VS CARGOS TOTALES SEGÚN CHURN
+
+```{r}
+ggplot(customers, aes(tenure, total_charges, color = churn, size = monthly_charges)) +
+  geom_point(alpha = 0.7) +
+  theme_minimal()
+```
+
+Los clientes que permanecen (No) acumulan cargos totales más altos gracias a su permanencia. Los que se fueron (Yes) tienen cargos totales más bajos, concentrados en tenures cortos. Además, el tamaño de los puntos refleja que quienes pagan más mensualmente acumulan cargos más rápido. Esto confirma que la permanencia es clave para maximizar ingresos.
+
+## GRÁFICO DE DISPERSIÓN CON JITTER: ANTIGÜEDAD VS CHURN
+
+```{r}
+ggplot(customers, aes(tenure, churn)) +
+  geom_jitter(alpha = 0.7, color = "steelblue") +
+  theme_minimal()
+```
+
+El churn se concentra en clientes con menor antigüedad, mientras que los que permanecen se distribuyen en tenures más largos. Esto indica que el riesgo de abandono es más alto en los primeros meses. La empresa debería enfocarse en estrategias de fidelización temprana, ya que los primeros meses son críticos para asegurar que el cliente se quede.
+
+## GRÁFICO DE DISPERSIÓN CON TRANSPARENCIA
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point(alpha = 0.4, size = 3) +
+  theme_minimal()
+```
+
+La transparencia permite ver mejor la densidad de puntos y evita la sobreposición. Se confirma que los clientes que se fueron se concentran en tenures cortos y cargos bajos, mientras que los que permanecen ocupan tenures largos y cargos altos. El churn está asociado a clientes de bajo valor y corta permanencia.
+
+## GRÁFICO DE DISPERSIÓN CON LEYENDA PERSONALIZADA
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point(size = 3, alpha = 0.7) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+Al mover la leyenda a la parte inferior, el gráfico se vuelve más claro y fácil de leer. La interpretación sigue siendo la misma: los clientes que se fueron se concentran en cargos bajos y tenures cortos, mientras que los que permanecen tienen cargos más altos y mayor permanencia. El cambio estético mejora la presentación para informes.
+
+## VISUALIZACIÓN ESTILO PUBLICACIÓN: ANÁLISIS DE CHURN
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Customer Churn Analysis",
+       x = "Meses de permanencia",
+       y = "Cargos mensuales",
+       color = "Churn")
+```
+
+Este gráfico resume todo el análisis en un estilo profesional: muestra la relación entre antigüedad y cargos mensuales, diferenciando clientes que se fueron y los que permanecen, con una línea de tendencia clara y un diseño limpio. La conclusión es contundente: los clientes más antiguos tienden a pagar más y tienen menor probabilidad de churn, mientras que los clientes nuevos y de bajo gasto son los más propensos a abandonar. Esto sugiere que invertir en retención temprana y en incentivar planes de mayor valor asegura ingresos más altos y menor churn en el largo plazo.
+
+# INTRODUCCION
+
+La visualización de datos constituye una pieza clave dentro del análisis estadístico y la toma de decisiones informadas. Mediante representaciones gráficas es posible reconocer patrones, tendencias y relaciones que de otro modo pasarían desapercibidas en un conjunto de datos.
+
+En este documento se emplean diversos conjuntos de datos simulados para poner en práctica técnicas de visualización con la librería ggplot2 del lenguaje R. El propósito es mostrar distintas maneras de comunicar información a través de gráficos de dispersión, histogramas, diagramas de caja, líneas de tiempo y visualizaciones facetadas.
+
+## Dataset
+
+```{r}
+library(ggplot2)
+
+students <- data.frame(
+  id = 1:20,
+  hours_study = c(2,3,4,5,6,3,4,7,8,5,6,7,3,2,9,10,4,6,8,5),
+  score = c(50,55,65,70,75,60,66,80,85,72,74,78,58,52,90,95,67,76,88,73),
+  gender = rep(c("Male","Female"),10),
+  major = rep(c("Engineering","Business","Arts","Science"),5)
+)
+```
+
+# ANALISIS DEL RENDIMIENTO DE ESTUDIANTES
+
+## DIAGRAMA DE DISPERSION HORAS DE ESTUDIO VS PUNTAJE
+
+Crear un gráfico de dispersión que muestre la relación entre las horas de estudio y el puntaje obtenido.
+
+```{r}
+ggplot(students, aes(hours_study, score)) +
+  geom_point(color="blue", size=3) +
+  theme_minimal() +
+  labs(
+    title="RELACION ENTRE HORAS DE ESTUDIO Y PUNTAJE",
+    x="HORAS DE ESTUDIO",
+    y="PUNTAJE"
+  ) +
+  theme(
+    plot.title = element_text(hjust=0.5),
+    panel.grid = element_line(color="#E6E6FA" )
+  )
+```
+
+El gráfico evidencia una relación ascendente entre las horas dedicadas al estudio y los puntajes obtenidos. A medida que los estudiantes invierten más tiempo en preparar sus materias, sus resultados tienden a mejorar de forma consistente.
+
+------------------------------------------------------------------------
+
+## ETIQUETAS Y TEMAS
+
+```{r message=FALSE, warning=FALSE}
+ggplot(students, aes(hours_study, score, color = gender)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  labs(
+    title = "HORAS DE ESTUDIO Y RENDIMIENTO POR GENERO",
+    x = "Horas de estudio",
+    y = "Puntaje"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),          
+    axis.title.x = element_text(size = 14),          
+    axis.title.y = element_text(size = 14),          
+    legend.position = "none"                         
+  )
+```
+
+La línea de regresión refleja de manera evidente la relación positiva entre el tiempo dedicado al estudio y el rendimiento académico. El uso de diferentes colores en el gráfico facilita la comparación entre géneros, mostrando que, aunque existen ligeras variaciones, la tendencia general es consistente: a mayor número de horas de estudio, mejores resultados en las calificaciones.
+
+## CAPAS GEOMETICAS
+
+## Boxplot
+
+```{r}
+
+ggplot(students, aes(gender, score, fill = gender)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Distribución de puntajes por género",
+    x = "Género",
+    y = "Puntaje"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    legend.position = "none"
+  )
+
+```
+
+Aunque ambos géneros muestran una tendencia positiva en el rendimiento, las mujeres parecen tener un desempeño más consistente, mientras que los hombres presentan mayor diversidad en sus resultados.
+
+## Histograma
+
+```{r}
+ggplot(students, aes(score)) +
+  geom_histogram(bins = 15, fill = "pink", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Distribución de puntajes",
+    x = "Puntaje",
+    y = "Frecuencia"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14)
+  )
+```
+
+La distribución de los puntajes muestra una clara concentración en la franja media alta, especialmente alrededor de los valores de 70 y 75, donde se observa la mayor frecuencia. Aunque los resultados abarcan un rango amplio, la mayoría de los estudiantes se agrupan en torno a valores medios, con pocos casos en los extremos bajos y altos. Esto indica que el rendimiento general es aceptable y relativamente estable dentro del grupo.
+
+## VISUALIZACION POR FACETAS
+
+## Relacion entre horas de estudio y puntaje segun la cerrera
+
+```{r message=FALSE, warning=FALSE}
+ggplot(students, aes(hours_study, score)) +
+  geom_point(size = 3, color = "#FFB6C1") +   
+  geom_smooth(method = "lm", se = FALSE, color = "deeppink") +
+  facet_wrap(~major) +
+  theme_minimal(base_size = 15) +             
+  labs(
+    title = "Relación entre horas de estudio y puntaje según la carrera",
+    x = "Horas de estudio",
+    y = "Puntaje"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5, size = 18))
+```
+
+El uso de facet_wrap() permite dividir el gráfico en paneles según la variable major, que representa la carrera de los estudiantes. Cada panel muestra de manera independiente la relación entre las horas de estudio y el puntaje dentro de una carrera específica. Esta organización facilita la comparación visual entre disciplinas, ya que permite identificar similitudes y diferencias en el comportamiento académico de los estudiantes según su área de estudio.
+
+## Relacion entre horas de estudio y puntaje por genero y carrera
+
+*facet_grid()*
+
+```{r message=FALSE, warning=FALSE}
+ggplot(students, aes(hours_study, score, color = gender)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~major) +
+  scale_color_manual(values = c("Male" = "blue", "Female" = "#FFB6C1")) +
+  theme_minimal(base_size = 15) +
+  labs(
+    title = "Relación entre horas de estudio y puntaje según la carrera",
+    x = "Horas de estudio",
+    y = "Puntaje"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5, size = 18))
+```
+
+El uso de facet_grid() organiza los gráficos en una cuadrícula donde las filas representan el género y las columnas la carrera de los estudiantes. Esta disposición permite observar simultáneamente cómo varía la relación entre horas de estudio y puntaje al considerar dos variables categóricas al mismo tiempo. De esta manera, se facilita la comparación cruzada: es posible identificar patrones comunes o diferencias tanto entre géneros como entre áreas de estudio, ofreciendo una visión más completa y detallada del comportamiento académico.
+
+## Personalización estética
+
+```{r message=FALSE, warning=FALSE}
+ggplot(students, aes(hours_study, score,
+                     color = gender,
+                     shape = major)) +
+  geom_point(aes(size = score), alpha = 0.8) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("Male" = "blue", "Female" = "#FF69B4")) + # azul y rosado
+  theme_minimal(base_size = 15) +
+  labs(
+    title = "Análisis multivariable del rendimiento académico",
+    x = "Horas de estudio",
+    y = "Calificación",
+    color = "Género",
+    shape = "Carrera",
+    size = "Calificación"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5, size = 18))
+```
+
+Este gráfico integra varias dimensiones de los datos en una sola visualización mediante atributos estéticos diferenciados. El color distingue el género, la forma de los puntos identifica la carrera y el tamaño refleja la calificación obtenida. Además, la línea de tendencia muestra cómo las horas de estudio se relacionan con el rendimiento académico. Esta combinación de elementos facilita un análisis multivariable, permitiendo observar patrones generales y, al mismo tiempo, comparar diferencias entre grupos de estudiantes según género y área de estudio.
+
+# VISUALIZACION DE DATOS EMPRESARIALES
+
+## Dataset
+
+```{r}
+sales <- data.frame(
+  month = rep(month.abb[1:12],4),
+  region = rep(c("North","South","East","West"),each=12),
+  sales = c(
+    120,130,125,140,150,160,170,165,155,145,135,125,
+    100,110,105,120,130,135,140,138,132,125,118,110,
+    90,95,100,110,115,120,125,123,118,112,105,98,
+    80,85,88,95,100,105,110,108,102,97,90,85
+  ),
+  marketing_spend = c(
+    20,22,21,23,25,26,28,27,26,24,23,22,
+    18,19,18,20,22,23,24,23,22,21,20,19,
+    15,16,17,18,19,20,21,20,19,18,17,16,
+    12,13,14,15,16,17,18,17,16,15,14,13
+  ),
+  employees = rep(c(50,45,40,35),each=12)
+)
+```
+
+## VISUALIZACION BASICA
+
+```{r message=FALSE, warning=FALSE}
+ggplot(sales, aes(x = marketing_spend, y = sales, color = region)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  labs(
+    title = "Ventas en función de la inversión en marketing",
+    x = "Inversión en marketing",
+    y = "Ventas"
+  ) +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(hjust = 0.5)
+  ) +
+  scale_color_manual(values = c("North" = "red", "South" = "blue", "East" = "green", "West" = "purple"))
+```
+
+El gráfico evidencia una relación positiva entre la inversión en marketing y las ventas a medida que aumenta el gasto en marketing, también tienden a crecer los ingresos. Las regiones con mayores niveles de inversión muestran un desempeño superior en ventas.
+
+## ETIQUETAS Y TEMAS
+
+```{r}
+ggplot(sales, aes(marketing_spend, sales, color = region)) +
+  geom_point(size = 4) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),   
+    axis.text = element_text(size = 12),                 
+    axis.title = element_text(size = 14),                
+    legend.position = "bottom"                          
+  ) +
+  labs(
+    title = "Relación entre inversión en marketing y ventas por región",
+    x = "Gasto en marketing",
+    y = "Ventas",
+    color = "Región"
+  )
+```
+
+El gráfico permite visualizar la evolución de las ventas a lo largo del año en cada región, mostrando patrones diferenciados según el territorio. Se observa que, aunque todas las regiones siguen una tendencia general de variaciones mensuales, algunas presentan un crecimiento más sostenido
+
+## VISUALISACION TEMPORAL
+
+```{r}
+ggplot(sales, aes(month, sales, group = region)) +
+  # Todas las regiones en gris claro
+  geom_line(color = "grey80", linewidth = 1) +
+  geom_point(color = "grey80", size = 2) +
+  # Región North resaltada
+  geom_line(
+    data = subset(sales, region == "North"),
+    aes(color = region),
+    linewidth = 1.5
+  ) +
+  geom_point(
+    data = subset(sales, region == "North"),
+    aes(color = region),
+    size = 3
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, size = 16)
+  ) +
+  labs(
+    title = "Evolución mensual de las ventas (región Norte destacada)",
+    x = "Mes",
+    y = "Ventas",
+    color = "Región"
+  )
+```
+
+El gráfico muestra la evolución mensual de las ventas en todas las regiones, destacando de manera especial la región Norte. Se observa que, aunque las demás regiones mantienen un comportamiento relativamente estable y en niveles más bajos, la región Norte presenta un volumen de ventas superior y variaciones más marcadas a lo largo del año. Esto sugiere que el Norte concentra una mayor dinámica comercial, con picos de crecimiento.
+
+## GRAFICAS DE DISTRIBUCION
+
+## Boxplot
+
+```{r}
+ggplot(sales, aes(region, sales, fill = region)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Distribución de las ventas según la región",
+    x = "Región",
+    y = "Ventas",
+    fill = "Región"
+  )
+```
+
+Muestra cómo se distribuyen las ventas en cada región. Se observa la mediana (línea central de cada caja), la variabilidad (altura de la caja y longitud de los bigotes), Las regiones de las cajas más altas indican ventas generalmente superiores
+
+## Histograma
+
+```{r}
+ggplot(sales, aes(marketing_spend)) +
+  geom_histogram(binwidth = 2, fill = "pink", color = "white") +
+  theme_minimal() +
+  labs(
+    title = "Distribución del gasto en marketing",
+    x = "Gasto en marketing",
+    y = "Frecuencia"
+  )
+```
+
+El histograma muestra cómo se distribuye los gasto en marketing a lo largo del año. Se observa que la mayoría de las inversiones se concentran en niveles bajos y medios, . La frecuencia disminuye a medida que el gasto aumenta, lo que sugiere que las campañas con mayor inversión son menos comunes. Esta distribución refleja que la empresa tiende a mantener un control en sus presupuestos de marketing.
+
+## Facetas
+
+```{r}
+ggplot(sales, aes(x = marketing_spend, y = sales, 
+                  color = region, size = employees)) +
+  geom_point(alpha = 0.8) +                                 
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +  
+  facet_wrap(~region) +                                    
+  theme_minimal() +                                        
+  labs(
+    title = "Relación entre inversión en marketing y ventas por región",
+    x = "Gasto en marketing",
+    y = "Ventas",
+    color = "Región",
+    size = "Número de empleados"
+  )
+```
+
+El gráfico muestra cómo el gasto en marketing se relaciona con las ventas en cada región, presentando un panel separado para cada una. En general, se ve que cuando aumenta la inversión en marketing también tienden a subir las ventas, aunque la fuerza de esa relación cambia según la región. En algunas zonas el efecto es más fuerte y claro, mientras que en otras es más moderado.
+
+El tamaño de los puntos indica la cantidad de empleados, y se nota que las regiones con más personal suelen tener mayores ventas.
+
+# Ejercicios con Dataset de Kaggle (Customer Churn)
+
+## Dataset
+
+```{r}
+customers <- data.frame(
+  tenure=c(1,5,10,12,24,36,48,60,72,3,6,9,15,18,30,42,54,66,70,8),
+  monthly_charges=c(70,75,80,85,90,95,100,105,110,65,72,78,82,88,92,98,102,108,112,76),
+  total_charges=c(70,375,800,1020,2160,3420,4800,6300,7920,195,432,702,1230,1584,2760,4116,5508,7128,7840,608),
+  churn=rep(c("Yes","No"),10),
+  contract = rep(c("Month-to-month","One year","Two year","Month-to-month"),5),
+  internet_service = rep(c("DSL","Fiber","DSL","Fiber"),5)
+)
+```
+
+------------------------------------------------------------------------
+
+## GRAFICO DE DISPERCION: ANTIGUEDAD VS CARGO MENSUAL
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges)) +
+  geom_point(color = "steelblue", size = 3, alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Relación entre antigüedad y cargos mensuales",
+       x = "Meses de permanencia",
+       y = "Cargos mensuales")
+```
+
+El gráfico muestra que a medida que aumenta la antigüedad del cliente, también tienden a subir los cargos mensuales. Esto sugiere que los clientes con más tiempo en la compañía suelen tener planes más costosos o servicios adicionales.
+
+## GRÁFICO DE DISPERSIÓN: CARGOS MENSUALES SEGÚN CHURN
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point(size = 3, alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Cargos mensuales según permanencia y churn",
+       x = "Meses de permanencia",
+       y = "Cargos mensuales",
+       color = "Churn")
+```
+
+Aquí se distingue entre clientes que abandonaron el servicio y los que permanecen. Se observa que los clientes con menor antigüedad y cargos más bajos tienden a tener mayor probabilidad de churn, mientras que los clientes más antiguos suelen mantenerse.
+
+## GRÁFICO DE DISPERSIÓN CON LÍNEA DE REGRESIÓN
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+  theme_minimal() +
+  labs(title = "Tendencia entre antigüedad y cargos mensuales",
+       x = "Meses de permanencia",
+       y = "Cargos mensuales",
+       color = "Churn")
+```
+
+La línea confirma una tendencia positiva, más antigüedad, mayores cargos.
+
+## GRÁFICO DE CAJA: CARGOS MENSUALES SEGÚN CHURN
+
+```{r}
+ggplot(customers, aes(churn, monthly_charges, fill = churn)) +
+  geom_boxplot(alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Distribución de cargos mensuales según churn",
+       x = "Churn",
+       y = "Cargos mensuales",
+       fill = "Churn")
+```
+
+Los clientes que se fueron tienen cargos más bajos y menos dispersión.
+
+## HISTOGRAMA: DISTRIBUCIÓN DE LA ANTIGÜEDAD DE CLIENTES
+
+```{r}
+ggplot(customers, aes(tenure)) +
+  geom_histogram(binwidth = 6, fill = "steelblue", color = "white") +
+  theme_minimal() +
+  labs(title = "Distribución de la antigüedad de clientes",
+       x = "Meses de permanencia",
+       y = "Frecuencia")
+```
+
+La mayoría de clientes se concentra en tenures bajos y medios.
+
+## HISTOGRAMA CON NÚMERO DE INTERVALOS AJUSTADO
+
+```{r}
+ggplot(customers, aes(tenure)) +
+  geom_histogram(bins = 5, fill = "darkorange", color = "white") +
+  theme_minimal()
+```
+
+Con menos bins se agrupan los clientes en rangos más amplios de permanencia.
+
+## GRÁFICO DE VIOLÍN: CARGOS MENSUALES POR TIPO DE CONTRATO
+
+```{r}
+ggplot(customers, aes(contract, monthly_charges, fill = contract)) +
+  geom_violin(alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Distribución de cargos mensuales por tipo de contrato",
+       x = "Contrato",
+       y = "Cargos mensuales")
+  
+```
+
+El gráfico de violín muestra cómo se distribuyen los cargos mensuales según el tipo de contrato. Se observa que los contratos de mes a mes tienen una distribución más amplia, con clientes pagando desde valores bajos hasta altos, lo que refleja mayor variabilidad en los planes. En cambio, los contratos de uno o dos años tienden a concentrarse en rangos más altos y estables, lo que indica que quienes se comprometen a largo plazo suelen elegir planes más costosos y consistentes.
+
+## GRÁFICO DE DENSIDAD: CARGOS MENSUALES SEGÚN CHURN
+
+```{r}
+ggplot(customers, aes(monthly_charges, fill = churn)) +
+  geom_density(alpha = 0.5) +
+  theme_minimal()
+```
+
+La densidad revela cómo se distribuyen los cargos mensuales entre clientes que se fueron y los que permanecen. Los clientes que abandonaron se concentran en valores más bajos de cargos mensuales, lo que sugiere que quienes pagan menos tienden a tener menor fidelidad. Por otro lado, los clientes que permanecen muestran mayor densidad en rangos medios y altos, lo que indica que quienes invierten más en el servicio tienden a quedarse.
+
+## GRÁFICa DE BARRAS: NÚMERO DE CLIENTES POR CONTRATO
+
+```{r}
+ggplot(customers, aes(contract)) +
+  geom_bar(fill = "steelblue") +
+  theme_minimal()
+```
+
+El contrato mes a mes es el más frecuente, lo que refleja preferencia por la flexibilidad. Sin embargo, esta modalidad también implica mayor riesgo de churn, ya que los clientes no tienen compromisos de largo plazo. Los contratos de uno y dos años son menos comunes, pero representan clientes más estables. Esto muestra que la empresa depende en gran medida de clientes con contratos cortos, lo que plantea un reto en fidelización.
+
+## GRÁFICO DE BARRAS: CONTRATOS LLENOS POR CHURN
+
+```{r}
+ggplot(customers, aes(contract, fill = churn)) +
+  geom_bar(position = "dodge") +
+  theme_minimal()
+```
+
+Los contratos mes a mes concentran la mayor proporción de clientes que se fueron, mientras que los contratos de uno y dos años tienen más clientes que permanecen. Esto confirma que la modalidad de contrato es un factor clave en la retención: los compromisos largos reducen el churn, mientras que la flexibilidad mensual lo aumenta. Incentivar contratos más largos podría mejorar la estabilidad de la base de clientes.
+
+## GRÁFICO DE DISPERSIÓN FACETEADO POR SERVICIO DE INTERNET
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point() +
+  facet_wrap(~internet_service) +
+  theme_minimal()
+```
+
+Separando por tipo de internet, se observa que los clientes con fibra óptica tienden a tener cargos más altos y muestran una relación más clara entre permanencia y gasto. Los clientes con DSL presentan cargos más bajos y más dispersión. Esto indica que el tipo de servicio influye en el perfil de gasto y posiblemente en la fidelidad: quienes contratan fibra invierten más y permanecen más tiempo, mientras que los de DSL son más sensibles al precio.
+
+## GRÁFICO FACETEADO POR TIPO DE CONTRATO
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point() +
+  facet_wrap(~contract) +
+  theme_minimal()
+```
+
+Los clientes con contratos de uno o dos años tienen cargos mensuales más altos y muestran menor churn. En contraste, los contratos mes a mes presentan mayor variabilidad y más casos de abandono.
+
+## GRÁFICO DE LÍNEA: PROMEDIO DE CARGOS MENSUALES POR ANTIGÜEDAD
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges)) +
+  stat_summary(fun = mean, geom = "line", color = "steelblue") +
+  theme_minimal()
+```
+
+La línea muestra que el promedio de cargos mensuales aumenta con la antigüedad. Esto puede deberse a que los clientes antiguos agregan servicios adicionales o migran a planes más completos. El hallazgo es positivo: mantener clientes más tiempo no solo reduce el churn, sino que también incrementa el valor del cliente en el tiempo.
+
+## GRÁFICO DE DISPERSIÓN: ANTIGÜEDAD VS CARGOS TOTALES SEGÚN CHURN
+
+```{r}
+ggplot(customers, aes(tenure, total_charges, color = churn, size = monthly_charges)) +
+  geom_point(alpha = 0.7) +
+  theme_minimal()
+```
+
+Los clientes que permanecen (No) acumulan cargos totales más altos gracias a su permanencia. Los que se fueron (Yes) tienen cargos totales más bajos, concentrados en tenures cortos. Además, el tamaño de los puntos refleja que quienes pagan más mensualmente acumulan cargos más rápido. Esto confirma que la permanencia es clave para maximizar ingresos.
+
+## GRÁFICO DE DISPERSIÓN CON JITTER: ANTIGÜEDAD VS CHURN
+
+```{r}
+ggplot(customers, aes(tenure, churn)) +
+  geom_jitter(alpha = 0.7, color = "steelblue") +
+  theme_minimal()
+```
+
+El churn se concentra en clientes con menor antigüedad, mientras que los que permanecen se distribuyen en tenures más largos. Esto indica que el riesgo de abandono es más alto en los primeros meses. La empresa debería enfocarse en estrategias de fidelización temprana, ya que los primeros meses son críticos para asegurar que el cliente se quede.
+
+## GRÁFICO DE DISPERSIÓN CON TRANSPARENCIA
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point(alpha = 0.4, size = 3) +
+  theme_minimal()
+```
+
+La transparencia permite ver mejor la densidad de puntos y evita la sobreposición. Se confirma que los clientes que se fueron se concentran en tenures cortos y cargos bajos, mientras que los que permanecen ocupan tenures largos y cargos altos. El churn está asociado a clientes de bajo valor y corta permanencia.
+
+## GRÁFICO DE DISPERSIÓN CON LEYENDA PERSONALIZADA
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point(size = 3, alpha = 0.7) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+Al mover la leyenda a la parte inferior, el gráfico se vuelve más claro y fácil de leer. La interpretación sigue siendo la misma: los clientes que se fueron se concentran en cargos bajos y tenures cortos, mientras que los que permanecen tienen cargos más altos y mayor permanencia. El cambio estético mejora la presentación para informes.
+
+## VISUALIZACIÓN ESTILO PUBLICACIÓN: ANÁLISIS DE CHURN
+
+```{r}
+ggplot(customers, aes(tenure, monthly_charges, color = churn)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Customer Churn Analysis",
+       x = "Meses de permanencia",
+       y = "Cargos mensuales",
+       color = "Churn")
+```
+
+Este gráfico resume todo el análisis en un estilo profesional: muestra la relación entre antigüedad y cargos mensuales, diferenciando clientes que se fueron y los que permanecen, con una línea de tendencia clara y un diseño limpio. La conclusión es contundente: los clientes más antiguos tienden a pagar más y tienen menor probabilidad de churn, mientras que los clientes nuevos y de bajo gasto son los más propensos a abandonar. Esto sugiere que invertir en retención temprana y en incentivar planes de mayor valor asegura ingresos más altos y menor churn en el largo plazo.
+
+# CARGAR DATOS Y CREAR FACTORES
+
+## DATASET
+
+```{r}
+library(readr)
+library(tidyverse)
+```
+
+```{r}
+churn <- read_csv("WA_Fn-UseC_-Telco-Customer-Churn.csv")
+churn$Churn <- as.factor(churn$Churn)
+churn$Contract <- as.factor(churn$Contract)
+churn$InternetService <- as.factor(churn$InternetService)
+```
+
+## DISTRIBUCIÓN DE TEENURE
+
+```{r}
+ggplot(churn, aes(tenure)) +
+  geom_histogram(bins = 30, fill = "pink", color = "black", alpha = 0.7) +
+  labs(title = "Distribución de Tenure", x = "Meses de permanencia", y = "Frecuencia") +
+  theme_minimal()
+```
+
+La empresa tiene dos perfiles principales de clientes: los que abandonan pronto y los que se mantienen fieles por largo tiempo.
+
+# GRAFICA DE DISTRIBUCIÓN DE CARGOS MENSUALES
+
+```{r}
+ggplot(churn, aes(MonthlyCharges)) +
+  geom_histogram(bins = 30, fill = "pink", color = "black", alpha = 0.7) +
+  labs(title = "Distribución de cargos mensuales", x = "Cargos mensuales", y = "Frecuencia") +
+  theme_minimal()
+```
+
+Se presentan dos concentraciones principales uno de valores bajos y otra en valores medio altos con menos frecuencia en los extremos.
+
+## REPRESENTACION DE LA DISTRIBUCION DE LOS CARGOS TOTALES
+
+```{r message=FALSE, warning=FALSE}
+ggplot(churn, aes(TotalCharges)) +
+  geom_histogram(bins = 30, fill = "pink", color = "black", alpha = 0.7) +
+  labs(title = "Distribución de Total Charges", x = "Cargos totales", y = "Frecuencia") +
+  theme_minimal()
+```
+
+Los clientes con cargos totales bajos suelen ser los que se van rápido; los que permanecen más tiempo acumulan montos altos, mostrando fidelidad.
+
+## GRAFICA DE BARRAS PROPORCION DE ABANDONO
+
+```{r}
+ggplot(churn, aes(Churn, fill = Churn)) +
+  geom_bar() +
+  labs(title = "Proporción de Churn", x = "Estado de Churn", y = "Cantidad") +
+  scale_fill_manual(values = c("pink", "purple")) +
+  theme_classic()
+```
+
+La mayoria de los clientes permanecen en el servicio mientras que una proporcion menor corresponde a clientes que abandonan, lo que indica baja tasa de abandono.
+
+## DIAGRAMA DE CAJA CARGOS MENSUALES FRENTE A ROTACION DE CLIENTES
+
+```{r}
+ggplot(churn, aes(Churn, MonthlyCharges, fill = Churn)) +
+  geom_boxplot(alpha = 0.6) +
+  labs(title = "Cargos mensuales según Churn", x = "Churn", y = "Cargos mensuales") +
+  scale_fill_manual(values = c("pink", "purple")) +
+  theme_minimal()
+```
+
+Los clientes con churn presentan cargos mensuales mas altos que los que no abandonan, segun el diagrama de caja.
+
+## GRAFICO DE DENSIDAD CARGOS MENSUALES POR TACION DE CLIENTES 
+
+```{r}
+ggplot(churn, aes(MonthlyCharges, fill = Churn)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Distribución de Monthly Charges por Churn", x = "Cargos mensuales", y = "Densidad") +
+  scale_fill_manual(values = c("pink", "purple")) +
+  theme_minimal()
+```
+
+Los clientes con churn se concentran en cargos mensuales mas altos,mientras que los que no abandonan se concentran en valores mas bajos, con cierta superposicion entre ambos.
+
+## ROTACION DE CLIENTE POR TIPO DE CONTRATO
+
+```{r}
+ggplot(churn, aes(Contract, fill = Churn)) +
+  geom_bar(position = "fill") +
+  labs(title = "Churn según tipo de contrato", x = "Tipo de contrato", y = "Proporción") +
+  scale_fill_manual(values = c("pink", "purple")) +
+  theme_minimal()
+```
+
+La rotación de clientes está directamente relacionada con la duración del contrato. Los contratos mensuales son los más riesgosos, mientras que los contratos largos (1 o 2 años) funcionan como una estrategia efectiva para retener clientes y reducir el churn.
+
+## ROTACION DE CLIENTES POR SERVICIO DE INTERNET
+
+```{r}
+ggplot(churn, aes(InternetService, fill = Churn)) +
+  geom_bar(position = "fill") +
+  labs(title = "Churn según servicio de internet", x = "Servicio de internet", y = "Proporción") +
+  scale_fill_manual(values = c("pink", "purple")) +
+  theme_minimal()
+```
+
+El tipo de servicio de internet influye directamente en la rotación de clientes. Los usuarios de Fiber Optic son los más propensos a abandonar, mientras que los de DSL y especialmente los que no tienen internet muestran mayor fidelidad. Esto sugiere que los planes de fibra óptica, aunque generan ingresos altos, requieren estrategias de retención más fuertes para reducir el churn.
+
+## CARGOS VS PERMANENCIA
+
+```{r}
+ggplot(churn, aes(x = tenure, y = MonthlyCharges)) +
+  geom_point(alpha = 0.6, color = "pink") +
+  labs(title = "Relación entre Tenure y MonthlyCharges",
+       x = "Meses de permanencia (Tenure)",
+       y = "Cargos mensuales (MonthlyCharges)") +
+  theme_minimal()
+```
+
+La combinación de cargos altos y permanencia corta es el perfil más vulnerable a la rotación. En cambio, los clientes con planes moderados y permanencia prolongada representan la base más estable y fiel de la empresa.
+
+## COSTOS VS ANTIGUEDAD CONDICIONADOS POR LA ROTACIÓN
+
+```{r}
+ggplot(churn, aes(x = tenure, y = MonthlyCharges, color = Churn)) +
+  geom_point(alpha = 0.6) +
+  labs(title = "Relación entre Tenure y MonthlyCharges según Churn",
+       x = "Meses de permanencia (Tenure)",
+       y = "Cargos mensuales (MonthlyCharges)") +
+  scale_color_manual(values = c("pink", "purple")) +
+  theme_minimal()
+```
+
+La rotación de clientes está fuertemente condicionada por la combinación de costos yantigüedad los clientes con planes caros y poca permanencia presentan un mayor riesgo de abandono, mientras que aquellos con planes moderados y antigüedad larga muestran mayor fidelidad y estabilidad.
+
+## AÑADIR LINEA DE REGRESION
+
+```{r}
+ggplot(churn, aes(x = tenure, y = MonthlyCharges, color = Churn)) +
+  geom_point(alpha = 0.4, size = 2) +   
+  geom_smooth(method = "lm", se = TRUE, linetype = "dashed") +  
+  labs(title = "Relación entre Tenure y MonthlyCharges según Churn",
+       subtitle = "Clientes que abandonan tienden a tener cargos altos y tenures cortos",
+       x = "Meses de permanencia (Tenure)",
+       y = "Cargos mensuales (MonthlyCharges)") +
+  scale_color_manual(values = c("pink", "purple")) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "top",
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(color = "gray40"))
+```
+
+Los clientes con tenure corto y cargos altos son los más propensos a abandonar, mientras que los clientes con tenure largo y cargos moderados muestran mayor fidelidad. La línea de regresión lo evidencia de forma clara y cuantitativa.
+
+## FACETA POR CONTRATO
+
+```{r}
+ggplot(churn, aes(x = tenure, y = MonthlyCharges, color = Churn)) +
+  geom_point(alpha = 0.4, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed") +
+  facet_wrap(~Churn) +
+  labs(title = "Relación entre Tenure y MonthlyCharges",
+       subtitle = "Facetas separadas por estado de Churn",
+       x = "Meses de permanencia (Tenure)",
+       y = "Cargos mensuales (MonthlyCharges)") +
+  scale_color_manual(values = c("pink", "purple")) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(color = "gray40"))
+```
+
+Facetar por contrato deja claro que la duración del contrato condiciona la rotación. Los contratos mensuales son los más riesgosos, mientras que los contratos largos aseguran fidelidad y estabilidad.
+
+## FACETA POR SERVICIO DE INTERNET
+
+```{r message=FALSE, warning=FALSE}
+ggplot(churn, aes(x = tenure, y = MonthlyCharges, color = Churn)) +
+  geom_point(alpha = 0.4, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed") +
+  facet_wrap(~InternetService) +
+  labs(title = "Relación entre Tenure y MonthlyCharges según InternetService",
+       subtitle = "Comparación de clientes por tipo de servicio de internet",
+       x = "Meses de permanencia (Tenure)",
+       y = "Cargos mensuales (MonthlyCharges)") +
+  scale_color_manual(values = c("pink", "purple")) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "top",
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(color = "gray40"))
+```
+
+Facetar por servicio de internet deja claro que la rotación depende del tipo de servicio. Los clientes de fibra óptica son los más vulnerables, mientras que los de DSL y sin internet muestran mayor estabilidad.
+
+## TRAMA DE BURBUJAS
+
+```{r message=FALSE, warning=FALSE}
+ggplot(churn, aes(x = tenure, 
+                  y = TotalCharges, 
+                  size = MonthlyCharges, 
+                  color = Churn)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed") +
+  labs(title = "Relación entre Tenure y TotalCharges",
+       subtitle = "El tamaño refleja MonthlyCharges y el color indica Churn",
+       x = "Meses de permanencia (Tenure)",
+       y = "Cargos totales (TotalCharges)",
+       size = "Cargos mensuales",
+       color = "Churn") +
+  scale_color_manual(values = c("pink", "purple")) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "right",
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(color = "gray40"))
+```
+
+La trama de burbujas muestra que la rotación de clientes depende de la combinación entre costos y antigüedad. Los clientes con planes mensuales, cargos altos y poca permanencia concentran el mayor riesgo de abandono, especialmente quienes usan fibra óptica, mientras que los clientes con contratos largos, cargos moderados y mayor antigüedad reflejan mayor fidelidad y estabilidad. En síntesis, los planes costosos y flexibles generan ingresos altos pero también un mayor riesgo de rotación temprana, mientras que los planes más accesibles y de largo plazo consolidan la base de clientes leales.
+
+## TRAMA AL ESTILO DE PUBLICIDAD
+
+```{r message=FALSE, warning=FALSE}
+ggplot(churn, aes(x = tenure, y = MonthlyCharges, color = Churn)) +
+  geom_point(alpha = 0.4, size = 2) +  
+  geom_smooth(method = "loess", se = TRUE, linetype = "dashed") + 
+  labs(title = "Customer Churn Analysis",
+       subtitle = "Relación entre Tenure y MonthlyCharges diferenciada por Churn",
+       x = "Customer Tenure (Meses de permanencia)",
+       y = "Monthly Charges (Cargos mensuales)") +
+  scale_color_manual(values = c("pink", "purple")) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "top",
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(color = "gray40"))
+```
+
+La trama de estilo de publicidad muestra cómo la rotación de clientes se relaciona con la manera en que se comunican y venden los servicios. En este tipo de visualización, se observa que los clientes expuestos a planes costosos y contratos mensuales tienden a abandonar con mayor frecuencia, especialmente si el servicio ofrecido es fibra óptica, mientras que aquellos con planes moderados, contratos largos y mayor antigüedad reflejan mayor fidelidad y estabilidad.
+
+# CONCLUSION
+
+La visualización de datos con ggplot2 permite identificar patrones y relaciones clave tanto en contextos académicos como empresariales. En el caso de los estudiantes, se confirma que más horas de estudio se traducen en mejores puntajes, con diferencias leves según género y carrera, y una concentración de resultados en rangos medios-altos. En el ámbito empresarial, se observa que mayor inversión en marketing impulsa las ventas, aunque el impacto varía por región. Finalmente, en el análisis de clientes churn, se evidencia que la rotación está condicionada por costos, antigüedad, tipo de contrato y servicio de internet, los clientes con contratos mensuales, cargos altos y poca permanencia son los más propensos a abandonar, mientras que los contratos largos y planes moderados aseguran mayor fidelidad.
